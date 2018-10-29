@@ -18,6 +18,9 @@ Preferences
 storage.json
 second/
 test/
+java/
+CachedExtensions/
+languagepacks.json
 
 *.joernIndex/
 
