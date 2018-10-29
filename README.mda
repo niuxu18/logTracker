@@ -1,0 +1,4 @@
+# vscode new repository on the command line
+  1. fetch patch from github
+  2. analyze patch to recognize log statement
+  3. joern query to build pdg of log statement
