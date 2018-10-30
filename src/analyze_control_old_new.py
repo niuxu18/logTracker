@@ -165,9 +165,9 @@ def deal_log( log_record, gumtree, log_records, total_log):
     # write old and new log file as well as function file
     # # get edit word and feature
     # edit_words, edit_feature = gumtree.get_word_edit_from_log(old_log, new_log)    
-    old_log_file = "temp_old_log_file.cpp"
+    old_log_file = "test/temp_old_log_file.cpp"
     my_util.save_file(old_log, old_log_file)
-    new_log_file = "temp_new_log_file.cpp"
+    new_log_file = "test/temp_new_log_file.cpp"
     my_util.save_file(new_log, new_log_file)
     # get edit type and edit word and edit feature
     gumtree.set_old_new_file(old_log_file, new_log_file)

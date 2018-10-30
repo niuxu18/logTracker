@@ -270,9 +270,9 @@ def generate_recommended_edit():
     gumtree = gumtree_api.Gumtree()
     index = 0
     for record in islice(records, 1, None):
-        old_log_file = "temp_old_log_file.cpp"
+        old_log_file = "test/temp_old_log_file.cpp"
         my_util.save_file(record[my_constant.CLASS_OLD_NEW_OLD_LOG], old_log_file)
-        new_log_file = "temp_new_log_file.cpp"
+        new_log_file = "test/temp_new_log_file.cpp"
         my_util.save_file(record[my_constant.CLASS_OLD_NEW_NEW_LOG], new_log_file)
         srcml = None
         if record[my_constant.CLASS_OLD_NEW_NEW_FUNCTION_LOC] != '-1':

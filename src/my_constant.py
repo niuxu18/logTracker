@@ -6,7 +6,7 @@
 """
 repository
 """
-REPOS = 'opendds'
+REPOS = 'wget'
 
 """
 generate related files

@@ -21,7 +21,7 @@ def get_recommended_log_edits(gumtree, srcml, old_log_file, new_log_file, candid
     @ involve generate log edit scripts: first get syntactical edit scripts, then remove variables with semantics\n
     """
     # get syntactical edit scripts
-    candidate_log_file = "temp_candidate_log_file.cpp"
+    candidate_log_file = "test/temp_candidate_log_file.cpp"
     my_util.save_file(candidate_log + ';', candidate_log_file)
     syntactical_edit_scripts = gumtree.recommend_log_syntactical_edits(old_log_file, new_log_file, candidate_log_file)
 
@@ -240,11 +240,11 @@ def seek_clone(repos_name, rebuild_repos=False, postfix=''):
 
         # old log file, new log file, function file and function loc
         old_loc = rule_record[my_constant.CLASS_OLD_NEW_OLD_LOC]
-        old_log_file = "temp_old_log_file.cpp"
+        old_log_file = "test/temp_old_log_file.cpp"
         my_util.save_file(rule_record[my_constant.CLASS_OLD_NEW_OLD_LOG], old_log_file)
-        new_log_file = "temp_new_log_file.cpp"
+        new_log_file = "test/temp_new_log_file.cpp"
         my_util.save_file(rule_record[my_constant.CLASS_OLD_NEW_NEW_LOG], new_log_file)
-        new_file = "temp_new_file.cpp"
+        new_file = "test/temp_new_file.cpp"
         print rule_record[my_constant.CLASS_OLD_NEW_NEW_FILE_NAME]
         my_util.copy_file(rule_record[my_constant.CLASS_OLD_NEW_NEW_FILE_NAME], new_file)
         # srcml for new function file
@@ -349,9 +349,9 @@ def seek_clone_for_corresponding_repos(rebuild_repos=False, is_train=''):
                 my_constant.CLUSTER_EDITION_AND_FEATURE_OLD_NEW_FILE_NAME, rule_record[0])
         # old log file, new log file, function file and function loc
         old_loc = rule_record[my_constant.CLASS_OLD_NEW_OLD_LOC]
-        old_log_file = "temp_old_log_file.cpp"
+        old_log_file = "test/temp_old_log_file.cpp"
         my_util.save_file(rule_record[my_constant.CLASS_OLD_NEW_OLD_LOG], old_log_file)
-        new_log_file = "temp_new_log_file.cpp"
+        new_log_file = "test/temp_new_log_file.cpp"
         my_util.save_file(rule_record[my_constant.CLASS_OLD_NEW_NEW_LOG], new_log_file)
         # srcml for new function file
         srcml = None
@@ -462,9 +462,9 @@ def seek_clone_for_train_rule(repos_name, repos_log_clone_writer,repos_function_
 
         # old log file, new log file, function file and function loc
         old_loc = rule_record[my_constant.CLASS_OLD_NEW_OLD_LOC]
-        old_log_file = "temp_old_log_file.cpp"
+        old_log_file = "test/temp_old_log_file.cpp"
         my_util.save_file(rule_record[my_constant.CLASS_OLD_NEW_OLD_LOG], old_log_file)
-        new_log_file = "temp_new_log_file.cpp"
+        new_log_file = "test/temp_new_log_file.cpp"
         my_util.save_file(rule_record[my_constant.CLASS_OLD_NEW_NEW_LOG], new_log_file)
         srcml = None
         if rule_record[my_constant.CLASS_OLD_NEW_NEW_FUNCTION_LOC] != '-1':

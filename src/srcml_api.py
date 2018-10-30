@@ -17,8 +17,7 @@ class SrcmlApi:
             self.set_function_file(source_file)
         elif source_file is not None:
             self.set_source_file(source_file)
-        # self.log_functions = my_util.retrieve_log_function(my_constant.LOG_CALL_FILE_NAME)
-        self.log_functions = my_util.retrieve_log_function('second/sample/make/make_logging_statement.csv')
+        self.log_functions = my_util.retrieve_log_function(my_constant.LOG_CALL_FILE_NAME)
         self.log_functions = my_util.function_to_regrex_name_str(self.log_functions)
         self.log_functions_extend = my_constant.LOG_VAGUE
 
@@ -318,6 +317,32 @@ class SrcmlApi:
         else:
             return content
 
+    def transform_operator(self):
+        """
+        @ param already have xml tree\n
+        @ return nothing\n
+        @ involve traverse xml tree and replace operator with suitable function\n
+        """
+        operator_nodes = self.root.iterdescendants(tag=self.operator_tag)
+        for operator_node in operator_nodes:
+            # find <<: name, operator
+            if self._remove_blank(operator_node) == '&lt;&lt;':
+                variable_node = operator_node.getprevious()
+                variable_type = self._get_varaible_type(variable_node)
+            
+                # append log function call after this operator
+                stmt_node = operator_node.getparent() # find statement node
+                while self._remove_prefix(stmt_node) != "expr_stmt":
+                    stmt_node = stmt_node.getparent()
+                # create statement that call log function
+                call_stmt_node = self._make_call_statement(stmt_node, variable_type, [variable_node])
+                stmt_node.addnext(call_stmt_node)
+        
+        # save new xml file
+        transformed_file = etree.tostring(self.root)
+        my_util.save_file(transformed_file, "test/temp_output.xml")
+        
+
     def parse_xml(self, xml_file):
         """
         @ param xml file\n
@@ -338,6 +363,7 @@ class SrcmlApi:
             self.name_tag = "{" + self.namespace_map['default'] + "}name"
             self.call_tag = "{" + self.namespace_map['default'] + "}call"
             self.function_tag = "{" + self.namespace_map['default'] + "}function"
+            self.operator_tag = "{" + self.namespace_map['default'] + "}operator"
             # self.loc_tag = "{" + self.namespace_map['pos'] + "}line"
 
     def _get_info_for_node(self, node):
@@ -407,6 +433,36 @@ class SrcmlApi:
                 loc_info.append(loc - 1)
 
         return node_info, loc_info
+
+    def _get_varaible_type(self, node):
+        """
+        @ param node(name, not none, has text)\n
+        @ return variable type name or variable name\n
+        @ involve try to find definition of given node, if failed return node text\n
+        """
+        depended_nodes = {}
+        node_line = self._get_location(node)
+        # find all name node
+        candi_nodes = self.tree.findall("//default:name", namespaces=self.namespace_map)
+        type_info = None
+        for candi_node in candi_nodes:
+            # if candi_node == node or candi_node.text != node.text or candi_node.text is None:
+            if candi_node.text != node.text or candi_node.text is None:
+                continue
+            candi_line = self._get_location(candi_node)
+            # find use as return or reference argument for functions
+            if candi_line <= node_line:
+                # filter by decl --type ----name --name
+                decl_node = candi_node.getparent()
+                if decl_node is not None and self._remove_prefix(decl_node) == 'decl':
+                    # mark is pointer or not
+                    type_node = self._get_real_type_node(candi_node.getprevious())
+                    type_info = self._get_text_for_nested_name(type_node)
+
+        if type_info is None:
+            type_info = self._get_text_for_nested_name(node)
+
+        return type_info
 
     def _get_depended_nodes(self, node):
         """
@@ -681,7 +737,29 @@ class SrcmlApi:
         @ involve get location directly without check\n
         """
         return int(node.attrib.values()[-2])
-        
+    
+    def _make_call_statement(self, demo_node, function_name, variable_nodes):
+        """
+        @ param demo_nodefunction name and list of variable nodes\n
+        @ return statement node\n
+        @ involve make lxml element that call given function with given variables\n
+        """
+        call_node = demo_node.makeelement("call")
+        call_node.append(demo_node.makeelement("name", ["text", function_name]))
+        arguments_node = demo_node.makeelement("argument_list", ["text", "("])
+        argument_node = demo_node.makeelement("argument")
+        for variable_node in variable_nodes:
+            argument_node.append(variable_node)
+            arguments_node.append(argument_node)
+        call_node.append(arguments_node)
+
+        stmt_node = demo_node.makeelement("expr_stmt")
+        expr_node = demo_node.makeelement("expr")
+        expr_node.append(call_node)
+        stmt_node.append(expr_node)
+
+        return stmt_node
+
     def _update_dict(self, dictionary, key, rank, value):
         """
         @ param dictionary, key, rank and value\n
