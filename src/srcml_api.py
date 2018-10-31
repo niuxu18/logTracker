@@ -326,7 +326,7 @@ class SrcmlApi:
         operator_nodes = self.root.iterdescendants(tag=self.operator_tag)
         for operator_node in operator_nodes:
             # find <<: name, operator
-            if self._remove_blank(operator_node) == '&lt;&lt;':
+            if self._remove_blank(operator_node) == '<<':
                 variable_node = operator_node.getprevious()
                 variable_type = self._get_varaible_type(variable_node)
             
@@ -336,6 +336,7 @@ class SrcmlApi:
                     stmt_node = stmt_node.getparent()
                 # create statement that call log function
                 call_stmt_node = self._make_call_statement(stmt_node, variable_type, [variable_node])
+                print call_stmt_node.dump()
                 stmt_node.addnext(call_stmt_node)
         
         # save new xml file
@@ -440,7 +441,6 @@ class SrcmlApi:
         @ return variable type name or variable name\n
         @ involve try to find definition of given node, if failed return node text\n
         """
-        depended_nodes = {}
         node_line = self._get_location(node)
         # find all name node
         candi_nodes = self.tree.findall("//default:name", namespaces=self.namespace_map)

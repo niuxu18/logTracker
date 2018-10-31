@@ -1,8 +1,9 @@
-import srcml_api
+#-*-coding: utf-8 -*-
 import os
-import my_util
 import commands
 import lxml
+import srcml_api
+import my_util
 
 def transfrom_operator(input_dir):
     """
