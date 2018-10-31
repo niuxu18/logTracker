@@ -1,0 +1,2 @@
+data/fetch/Kitware_CMake_seek_clone.csv filter=lfs diff=lfs merge=lfs -text
+second/download/httpd/gumtree.tar.gz filter=lfs diff=lfs merge=lfs -text
