@@ -21,6 +21,7 @@ test/
 java/
 CachedExtensions/
 languagepacks.json
+.vscode/
 
 *.joernIndex/
 
