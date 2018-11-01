@@ -28,7 +28,7 @@ class SrcmlApi:
         @ involve create xml file(temp.xml) for source file and build namespace info\n
         """
         # intiate xml info
-        xml_file = 'temp.xml'
+        xml_file = 'test/temp.xml'
         # print '%s begin' %source_file
         commands.getoutput('srcml --position ' + source_file + ' -o ' + xml_file)
         # print '%s end' %source_file
@@ -200,6 +200,23 @@ class SrcmlApi:
                     self.control += control_info
                     self.control_depenedence_loc += control_loc
                 return True
+            # filter by tag catch
+            if tag == 'catch':
+                self.control = []
+                # find decl --type ----name
+                type_nodes = parent.iterdescendants(tag=self.type_tag)
+                for type_node in type_nodes:
+                    control_info = ''
+                    children = type_node.getchildren()
+                    for child in children:
+                        if self._remove_prefix(child) == "name":
+                            control_info += self._get_text_for_nested_name(child)
+                    if control_info == '':
+                        control_info = None
+                    self.control.append(control_info)
+
+                self.control_depenedence_loc = self._get_location_for_nested_node(parent)
+                return True
 
         return False
 
@@ -323,21 +340,25 @@ class SrcmlApi:
         @ return nothing\n
         @ involve traverse xml tree and replace operator with suitable function\n
         """
-        operator_nodes = self.root.iterdescendants(tag=self.operator_tag)
+        operator_nodes = self.root.iterdescendants(self.operator_tag)
         for operator_node in operator_nodes:
             # find <<: name, operator
-            if self._remove_blank(operator_node) == '<<':
-                variable_node = operator_node.getprevious()
-                variable_type = self._get_varaible_type(variable_node)
-            
-                # append log function call after this operator
-                stmt_node = operator_node.getparent() # find statement node
-                while self._remove_prefix(stmt_node) != "expr_stmt":
-                    stmt_node = stmt_node.getparent()
+            if self._remove_blank(operator_node) == '<<' and self._remove_prefix(operator_node).find("oper") != -1:
+                log_node = operator_node.getprevious() 
+                stmt_nodes, variable_nodes = self._get_variable_nodes_for_operator(self._get_text_for_nested_name(log_node), operator_node)
+                if stmt_nodes is None or len(variable_nodes) == 0:
+                    continue
+
+                log_type = self._get_varaible_type(log_node)
                 # create statement that call log function
-                call_stmt_node = self._make_call_statement(stmt_node, variable_type, [variable_node])
-                print call_stmt_node.dump()
-                stmt_node.addnext(call_stmt_node)
+                call_stmt_node = self._make_call_statement(stmt_nodes[0], log_type, variable_nodes)
+                # call statement with suitable tail
+                # call_stmt_node.tail = stmt_nodes[-1].tail
+                stmt_nodes[-1].addnext(call_stmt_node)
+                block_node = stmt_nodes[0].getparent()
+                if block_node != None:
+                    for stmt_node in stmt_nodes:
+                        block_node.remove(stmt_node)
         
         # save new xml file
         transformed_file = etree.tostring(self.root)
@@ -364,7 +385,9 @@ class SrcmlApi:
             self.name_tag = "{" + self.namespace_map['default'] + "}name"
             self.call_tag = "{" + self.namespace_map['default'] + "}call"
             self.function_tag = "{" + self.namespace_map['default'] + "}function"
-            self.operator_tag = "{" + self.namespace_map['default'] + "}operator"
+            self.operator_tag = "{" + self.namespace_map['default'] + "}*"
+            self.expr_stmt_tag = "{" + self.namespace_map['default'] + "}expr_stmt"
+            self.type_tag = "{" + self.namespace_map['default'] + "}type"
             # self.loc_tag = "{" + self.namespace_map['pos'] + "}line"
 
     def _get_info_for_node(self, node):
@@ -400,23 +423,23 @@ class SrcmlApi:
                         depended_node = depended_sub_node
                         break
                 info = self._get_text_for_nested_name(depended_node)
-                # if info in self.log_functions or info in self.log_functions_extend:
-                if re.search(self.log_functions, info, re.I) or info in self.log_functions_extend:                
+                # record nearest arg and decl
+                if depended_type == my_constant.VAR_TYPE and type_info is None:
+                    type_info = info + my_constant.FlAG_TYPE
+                    type_loc = depended_line
+                # record nearest arg and decl
+                if re.search(self.log_functions, info, re.I) or info.lower() in self.log_functions_extend:
                     continue
                 # level 1
                 if depended_type == my_constant.VAR_FUNC_RETURN:
                     return_info = info + my_constant.FlAG_FUNC_RETURN
                     return_loc = depended_line
                     break
-                elif depended_type == my_constant.VAR_FUNC_ARG_RETURN:
+                if depended_type == my_constant.VAR_FUNC_ARG_RETURN:
                     return_info = info + my_constant.FlAG_FUNC_ARG_RETURN
                     return_loc = depended_line
                     break
-                # record nearest arg and decl
-                elif depended_type == my_constant.VAR_TYPE and type_info is None:
-                    type_info = info + my_constant.FlAG_TYPE
-                    type_loc = depended_line
-                elif depended_type == my_constant.VAR_FUNC_ARG and arg_info is None:
+                if depended_type == my_constant.VAR_FUNC_ARG and arg_info is None:
                     arg_info = info + my_constant.FlAG_FUNC_ARG
                     arg_loc = depended_line
             # return > arg > var type
@@ -442,12 +465,13 @@ class SrcmlApi:
         @ involve try to find definition of given node, if failed return node text\n
         """
         node_line = self._get_location(node)
+        node_text = self._get_text_for_nested_name(node)
         # find all name node
         candi_nodes = self.tree.findall("//default:name", namespaces=self.namespace_map)
         type_info = None
         for candi_node in candi_nodes:
             # if candi_node == node or candi_node.text != node.text or candi_node.text is None:
-            if candi_node.text != node.text or candi_node.text is None:
+            if self._get_text_for_nested_name(candi_node) != node_text:
                 continue
             candi_line = self._get_location(candi_node)
             # find use as return or reference argument for functions
@@ -460,7 +484,7 @@ class SrcmlApi:
                     type_info = self._get_text_for_nested_name(type_node)
 
         if type_info is None:
-            type_info = self._get_text_for_nested_name(node)
+            type_info = node_text
 
         return type_info
 
@@ -682,7 +706,7 @@ class SrcmlApi:
         @ involve remove blank directly without check\n
         """
         if node.text is None:
-            print 'no need to remove for none text'
+            # print 'no need to remove for none text'
             return None
         return node.text.replace(' ', '')
 
@@ -695,25 +719,17 @@ class SrcmlApi:
         """
         if node.text is not None:
             text = self._remove_blank(node)
-            next_node = node.getnext()
-            while next_node is not None and self._remove_prefix(next_node) == 'name':
-                # add next node text
-                if next_node.text is not None:
-                    text = text + ' ' + next_node.text
-                else:
-                    text = text + ' ' + self._get_text_for_nested_name(next_node)
-                next_node = next_node.getnext()
             return text
         # traverse children of name without text
         else:
             text = ''
-            name_nodes = node.iterdescendants(tag=self.name_tag)
+            name_nodes = node.iterdescendants()
             for name_node in name_nodes:
                 # add current name node text
                 if name_node.text is not None:
-                    text = text + ' ' + self._remove_blank(name_node)
+                    text = text + self._remove_blank(name_node)
                 else:
-                    text = text + ' ' + self._get_text_for_nested_name(name_node)
+                    text = text + self._get_text_for_nested_name(name_node)
             return text
 
     def _get_location_for_nested_node(self, node):
@@ -736,21 +752,90 @@ class SrcmlApi:
         @ return loacation(int)\n
         @ involve get location directly without check\n
         """
-        return int(node.attrib.values()[-2])
+        if len(node.attrib.values()) >= 2:
+            return int(node.attrib.values()[-2])
+        else:
+            return int(node.sourceline) - 1
     
+    def _get_variable_nodes_for_operator(self, variable_name, operator_node):
+        """
+        @ param variable name and operator node\n
+        @ return list of statement node and list of variable node\n
+        @ involve find varaible node from the same statements (<< a << b) and following statement(cout << a; cout << b;)\n
+        """
+        # stmt node
+        stmt_node = operator_node.getparent()
+        while stmt_node != None and self._remove_prefix(stmt_node) != "expr_stmt":
+            stmt_node = stmt_node.getparent()
+        if stmt_node is None:
+            return None, None
+        stmt_nodes = [stmt_node]
+        variable_nodes = []
+
+        variable_nodes += self._get_variable_nodes_for_one_statement(operator_node)
+        
+        # following statement cout << a << b; cout << c << d;
+        next_stmt_node = stmt_node.getnext()
+        is_continue = True
+        while next_stmt_node != None and self._remove_prefix(next_stmt_node) == "expr_stmt" and is_continue:
+            is_continue = False
+            # first operator node that is <<
+            sub_operator_nodes = next_stmt_node.iterdescendants(self.operator_tag)
+            for sub_operator_node in sub_operator_nodes:
+                if self._remove_blank(sub_operator_node) == "<<" and \
+                    self._get_text_for_nested_name(sub_operator_node.getprevious()) == variable_name:
+
+                    variable_nodes += self._get_variable_nodes_for_one_statement(sub_operator_node)
+                    stmt_nodes.append(next_stmt_node)
+                    is_continue = True
+                    break
+
+            next_stmt_node = next_stmt_node.getnext()
+
+        return stmt_nodes, variable_nodes
+
+    def _get_variable_nodes_for_one_statement(self, operator_node):
+        """
+        @ param operator node\n
+        @ return list of variable node\n
+        @ involve find varaible node from the same statements (<< a << b)\n
+        """  
+        variable_nodes = []
+        # same statement << a << b
+        sibling_nodes = operator_node.itersiblings()
+        for sibling_node in sibling_nodes:
+            if self._remove_prefix(sibling_node) == "operator" and self._remove_blank(sibling_node) == "<<":
+                continue # skip <<
+            else:
+                variable_nodes.append(sibling_node)
+                
+        return variable_nodes
+
     def _make_call_statement(self, demo_node, function_name, variable_nodes):
         """
-        @ param demo_nodefunction name and list of variable nodes\n
+        @ param demo_node, function name and list of variable nodes\n
         @ return statement node\n
         @ involve make lxml element that call given function with given variables\n
         """
         call_node = demo_node.makeelement("call")
-        call_node.append(demo_node.makeelement("name", ["text", function_name]))
-        arguments_node = demo_node.makeelement("argument_list", ["text", "("])
-        argument_node = demo_node.makeelement("argument")
-        for variable_node in variable_nodes:
+        call_name_node = demo_node.makeelement("name")
+        call_name_node.text = function_name
+        call_node.append(call_name_node)
+
+        arguments_node = demo_node.makeelement("argument_list")
+        arguments_node.text = "("
+        arguments_node.tail = ";"
+        for variable_node in variable_nodes[:-1]:
+            argument_node = demo_node.makeelement("argument")
             argument_node.append(variable_node)
+            argument_node.tail = ','
             arguments_node.append(argument_node)
+        # last variable node tail with )
+        argument_node = demo_node.makeelement("argument")
+        argument_node.append(variable_nodes[-1])
+        argument_node.tail = ')'
+        arguments_node.append(argument_node)
+
         call_node.append(arguments_node)
 
         stmt_node = demo_node.makeelement("expr_stmt")
@@ -786,10 +871,24 @@ if __name__ == "__main__":
     #      print srcml_api.get_log_info()
     #      print srcml_api.get_semantics_for_variable("result")
 
-    print re.search(r'@@([^@]*)@@', 'add	$$name: quote$$	in	@@argument_list: (stderr, _("%s: %s: Invalid value `%s\'.\n"), exec_name, com, val);@@').groups()
+    #print re.search(r'@@([^@]*)@@', 'add	$$name: quote$$	in	@@argument_list: (stderr, _("%s: %s: Invalid value `%s\'.\n"), exec_name, com, val);@@').groups()
+    
     # print srcml_api.get_logs_calls_types()
     # srcml_api = SrcmlApi('/usr/info/code/cpp/LogMonitor/LogMonitor/second/download/httpd/gumtree/httpd_repos_function_2380_httpd-2.2.34.cpp', True)
 
     # if srcml_api.set_log_loc(6):
     #     print srcml_api.get_log_info()
     #     print srcml_api.get_semantics_for_variable("literal: 60")
+
+    srcml = SrcmlApi()
+    filename = "second/sample/ice/versions/Ice-2.1.0/demo/Freeze/library/Parser.cpp"
+    # commands.getoutput("srcml " + filename + " -o test/temp_input.xml")
+    # srcml.parse_xml("test/temp_input.xml")
+    # srcml.transform_operator()
+    # # transform source code from temp output file
+    # commands.getoutput("srcml " + "test/temp_output.xml -S > test/output.cpp")
+    srcml.set_source_file(filename)
+    if srcml.set_log_loc(74):
+        print srcml.get_log_info()
+        srcml.set_control_dependence()
+        print srcml.get_control_info()

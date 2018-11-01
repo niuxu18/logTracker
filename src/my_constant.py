@@ -6,7 +6,7 @@
 """
 repository
 """
-REPOS = 'wget'
+REPOS = 'ice'
 
 """
 generate related files

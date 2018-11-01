@@ -28,7 +28,7 @@ class SrcmlApi:
         @ involve create xml file(temp.xml) for source file and build namespace info\n
         """
         # intiate xml info
-        xml_file = 'temp.xml'
+        xml_file = 'test/temp.xml'
         # print '%s begin' %source_file
         commands.getoutput('srcml --position ' + source_file + ' -o ' + xml_file)
         # print '%s end' %source_file
