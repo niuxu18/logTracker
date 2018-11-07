@@ -580,7 +580,7 @@ class SrcmlApi:
 
         # add call info for call descendants
         call_info = []
-        loc_info = [self._get_location_for_nested_node(node)] # if/switch or case location
+        loc_info = [self._get_location_for_nested_node(node) - 1] # if/switch or case location
         for call_node in node.iterdescendants(tag=self.call_tag):
             # call --name --argument list ----argument
             info = self._get_text_for_nested_name(call_node[0])
