@@ -44,7 +44,7 @@ def generate_rules(parent_dir):
 
     print '\n****************now generating rules for repos %s***************' %(my_constant.REPOS)
     # analyze hunk
-    fetch_hunk.fetch_version_diff(True)
+    fetch_hunk.fetch_version_diff(False)
     analyze_hunk.fetch_hunk()
 
     # analyze gumtree and srcml

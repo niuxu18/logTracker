@@ -339,6 +339,9 @@ def analyze_old_new(is_rebuild = False):
         if gumtree.get_ddg_edited_type(ddg_hunk_locs):
             record[my_constant.FETCH_LOG_ACTION_TYPE] = my_constant.LOG_DDG_MODIFY
             continue
+        print ddg_locs
+        print hunk_loc
+        print function_loc
         old_new_llvm_writer.writerow(record + [json.dumps(check), json.dumps(variable), ddg_codes, ddg_hunk_locs])
         total_log += 1
 
