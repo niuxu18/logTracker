@@ -289,7 +289,7 @@ def get_csv_record_len(records):
     return len(records) - 1, records
 
 
-def value_to_hyperlink(value):
+def value_to_hyperlink(value, current_dir):
     """
     @ param value\n
     @ return value or hyperlinked value\n
@@ -306,7 +306,7 @@ def value_to_hyperlink(value):
             hyperlink = 'HYPERLINK("file://'
         # is relavent
         elif is_relavent:
-            hyperlink = 'HYPERLINK("file://' + commands.getoutput('pwd') + '/'
+            hyperlink = 'HYPERLINK("file://' + current_dir + '/'
         if hyperlink:
             hyperlink = hyperlink + value + '", "' + value + '")'
             return xlwt.Formula(hyperlink)
@@ -325,12 +325,13 @@ def csv_to_xlsx(file_name, sheet):
     csv_file = file(file_name, 'rb')
     records = csv.reader(csv_file)
     r = 0
+    current_dir = commands.getoutput('pwd')
     # write each row
     for record in records:
         c = 0
         # write each column
         for value in record:
-            value = value_to_hyperlink(value)
+            value = value_to_hyperlink(value, current_dir)
             sheet.write(r, c, value)
             c += 1
         r += 1

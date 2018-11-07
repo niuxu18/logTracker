@@ -557,6 +557,7 @@ def generate_xlsx_from_clone():
     sheet = workbook.add_sheet('log_clone')
     clone_file = file(my_constant.ANALYZE_CLONE_LOG_FILE_NAME, 'rb')
     records = csv.reader(clone_file)
+    current_dir = commands.getoutput('pwd')
     # sheet title
     c = 0
     for value in my_constant.CLONE_LOG_TITLE:
@@ -574,12 +575,12 @@ def generate_xlsx_from_clone():
             c = 0
             # write into each column
             for value in revision:
-                value = my_util.value_to_hyperlink(value)
+                value = my_util.value_to_hyperlink(value, current_dir)
                 sheet.write(r, c, value)
                 c += 1
             log_record = record[spliter_index:]
             for value in log_record:
-                value = my_util.value_to_hyperlink(value)
+                value = my_util.value_to_hyperlink(value, current_dir)
                 sheet.write(r, c, value)
                 c += 1
             r += 1
@@ -606,12 +607,12 @@ def generate_xlsx_from_clone():
             c = 0
             # write into each column
             for value in revision:
-                value = my_util.value_to_hyperlink(value)
+                value = my_util.value_to_hyperlink(value, current_dir)
                 sheet.write(r, c, value)
                 c += 1
             log_record = record[spliter_index:]
             for value in log_record:
-                value = my_util.value_to_hyperlink(value)
+                value = my_util.value_to_hyperlink(value, current_dir)
                 sheet.write(r, c, value)
                 c += 1
             r += 1

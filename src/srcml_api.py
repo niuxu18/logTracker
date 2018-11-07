@@ -215,7 +215,7 @@ class SrcmlApi:
                         control_info = None
                     self.control.append(control_info)
 
-                self.control_depenedence_loc = self._get_location_for_nested_node(parent)
+                self.control_depenedence_loc = [self._get_location_for_nested_node(parent)]
                 return True
 
         return False
