@@ -151,17 +151,19 @@ def is_match_for_insert_rule(rule_feature, function_feature):
     @ return true if match\n
     @ involve validate that any element in rule feature must exist in function\n
     """
-    # return False
-    check = rule_feature[0]
     # variable = rule_feature[1]
     calls = function_feature[0]
     types = function_feature[1]
     # validate whether any one in check or variable is in calls and types
-    rule_infos = check
+    rule_infos = rule_feature[0] + rule_feature[1]
     function_info = calls + types
     for info in rule_infos:
-        if info and not info.replace('_ret','').replace('_arg','') in function_info:
-            return False
+        if info is None:
+            continue
+        infos = info.split('.')
+        for info in infos:
+            if info != 'None' and not info.replace('_ret','').replace('_arg','') in function_info:
+                return False
     return True
 
 def is_match_for_modify_rule(rule_feature, repos_log_feature):

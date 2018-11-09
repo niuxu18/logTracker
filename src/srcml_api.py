@@ -399,64 +399,74 @@ class SrcmlApi:
         # filter out the one with log statement changes
         name_nodes, node_info, loc_info = self._get_pure_name_nodes(node)
         for name_node in name_nodes:
-            name_line = int(self._get_location(name_node))
-            depended_nodes = self._get_depended_nodes(name_node)
-            type_info = None
-            arg_info = None
-            return_info = None
-            type_loc = None
-            arg_loc = None
-            return_loc = None
-            # iterate from name node
-            depended_lines = depended_nodes.keys()
-            depended_lines.sort(key=lambda d:abs(int(d)-name_line))
-            for depended_line in depended_lines:
-                depended_info = depended_nodes[depended_line]
-                depended_node = depended_info[0]
-                depended_type = depended_info[1]                
-                # get children whose tag is name [call --name or type (--specifier) --name]
-                if depended_node is None:
-                    continue
-                depended_sub_nodes = depended_node.getchildren()
-                for depended_sub_node in depended_sub_nodes:
-                    if self._remove_prefix(depended_sub_node) == 'name':
-                        depended_node = depended_sub_node
-                        break
-                info = self._get_text_for_nested_name(depended_node)
-                # record nearest arg and decl
-                if depended_type == my_constant.VAR_TYPE and type_info is None:
-                    type_info = info + my_constant.FlAG_TYPE
-                    type_loc = depended_line
-                # record nearest arg and decl
-                if re.search(self.log_functions, info, re.I) or info.lower() in self.log_functions_extend:
-                    continue
-                # level 1
-                if depended_type == my_constant.VAR_FUNC_RETURN:
-                    return_info = info + my_constant.FlAG_FUNC_RETURN
-                    return_loc = depended_line
-                    break
-                if depended_type == my_constant.VAR_FUNC_ARG_RETURN:
-                    return_info = info + my_constant.FlAG_FUNC_ARG_RETURN
-                    return_loc = depended_line
-                    break
-                if depended_type == my_constant.VAR_FUNC_ARG and arg_info is None:
-                    arg_info = info + my_constant.FlAG_FUNC_ARG
-                    arg_loc = depended_line
-            # return > arg > var type
-            if return_info is not None:
-                info = return_info
-                loc = return_loc
-            elif arg_info is not None:
-                info = arg_info
-                loc = arg_loc
-            else:
-                info = type_info
-                loc = type_loc
+            info, loc = self._get_info_for_name_node(name_node)
             node_info.append(info)
             if info is not None:
                 loc_info.append(loc - 1)
 
         return node_info, loc_info
+
+    def _get_info_for_name_node(self, name_node, call_times = None):
+        """
+        @ param node (name)
+        @ return info and loc 
+        @ involve get dependent nodes of this name node and analyze the type as info
+        """
+        name_line = int(self._get_location(name_node))
+        depended_nodes = self._get_depended_nodes(name_node)
+        type_info = None
+        arg_info = None
+        return_info = None
+        type_loc = None
+        arg_loc = None
+        return_loc = None
+        # iterate from name node
+        depended_lines = depended_nodes.keys()
+        depended_lines.sort(key=lambda d:abs(int(d)-name_line))
+        for depended_line in depended_lines:
+            depended_info = depended_nodes[depended_line]
+            depended_node = depended_info[0]
+            depended_type = depended_info[1]                
+            # get children whose tag is name [call --name or type (--specifier) --name]
+            if depended_node is None:
+                continue
+            depended_sub_nodes = depended_node.getchildren()
+            for depended_sub_node in depended_sub_nodes:
+                if self._remove_prefix(depended_sub_node) == 'name':
+                    depended_node = depended_sub_node
+                    break
+            # record nearest arg and decl
+            if depended_type == my_constant.VAR_TYPE and type_info is None:
+                type_info = self._get_text_for_nested_name(depended_node) + my_constant.FlAG_TYPE
+                type_loc = depended_line
+            # record nearest arg and decl
+            info = self._get_info_for_call_node(depended_node, call_times)
+            if info is None or re.search(self.log_functions, info, re.I) or info.lower() in self.log_functions_extend:
+                continue
+            # level 1
+            if depended_type == my_constant.VAR_FUNC_RETURN:
+                return_info = info + my_constant.FlAG_FUNC_RETURN
+                return_loc = depended_line
+                break
+            if depended_type == my_constant.VAR_FUNC_ARG_RETURN:
+                return_info = info + my_constant.FlAG_FUNC_ARG_RETURN
+                return_loc = depended_line
+                break
+            if depended_type == my_constant.VAR_FUNC_ARG and arg_info is None:
+                arg_info = info + my_constant.FlAG_FUNC_ARG
+                arg_loc = depended_line
+        # return > arg > var type
+        if return_info is not None:
+            info = return_info
+            loc = return_loc
+        elif arg_info is not None:
+            info = arg_info
+            loc = arg_loc
+        else:
+            info = type_info
+            loc = type_loc
+        return info, loc
+
 
     def _get_varaible_type(self, node):
         """
@@ -580,14 +590,15 @@ class SrcmlApi:
 
         # add call info for call descendants
         call_info = []
-        loc_info = [self._get_location_for_nested_node(node) - 1] # if/switch or case location
+        # loc_info = [self._get_location_for_nested_node(node) - 1] # if/switch or case location
+        loc_info = []
         for call_node in node.iterdescendants(tag=self.call_tag):
             # call --name --argument list ----argument
-            info = self._get_text_for_nested_name(call_node[0])
+            info = self._get_info_for_call_node(call_node[0])
             if not re.search(self.log_functions, info, re.I) and info not in self.log_functions_extend:
                 call_info.append(info + my_constant.FlAG_FUNC_RETURN)
                 # add location for call, index from 0
-                loc_info.append(self._get_location_for_nested_node(call_node[0]) - 1)
+                loc_info.append(self._get_location_for_nested_node(call_node[0]) - 1) # call inner switch/if
         return name_nodes, call_info, loc_info
 
     def _is_case_for_node(self, case_node, node):
@@ -710,6 +721,32 @@ class SrcmlApi:
             return None
         return node.text.replace(' ', '')
 
+    def _get_info_for_call_node(self, node, call_times = None):
+        """
+        @ param first child of call node(may contain . or ->)\n
+        @ return (semantics)./->function name\n
+        @ involve deal with . or -> in call name, try to understand the semantics of the caller instead of directly return its name\n
+        """
+        # contain operator ?
+        operator_nodes = node.iterdescendants()
+        for operator_node in operator_nodes:
+            if self._remove_prefix(operator_node).find("oper") != -1 and \
+                (self._remove_blank(operator_node) == '.' or self._remove_blank(operator_node) == '->'):
+                # --caller --./-> --function name
+                if call_times is not None:
+                    if call_times > 10: # avoid a->b b->c c->d ... avoid too deep
+                        return None
+                    call_times += 1
+                else:
+                    call_times = 0 # initialize
+
+                caller, temp_loc = self._get_info_for_name_node(operator_node.getprevious(), call_times)
+                function_name = self._get_info_for_call_node(operator_node.getnext())
+
+                return str(caller) + '.' + function_name
+
+        # no operator
+        return self._get_text_for_nested_name(node)
 
     def _get_text_for_nested_name(self, node):
         """
@@ -881,14 +918,12 @@ if __name__ == "__main__":
     #     print srcml_api.get_semantics_for_variable("literal: 60")
 
     srcml = SrcmlApi()
-    filename = "second/sample/ice/versions/Ice-2.1.0/demo/Freeze/library/Parser.cpp"
+    filename = "second/sample/ice/generate/gumtree/ice_old_function_2747.cpp"
     # commands.getoutput("srcml " + filename + " -o test/temp_input.xml")
     # srcml.parse_xml("test/temp_input.xml")
     # srcml.transform_operator()
     # # transform source code from temp output file
     # commands.getoutput("srcml " + "test/temp_output.xml -S > test/output.cpp")
-    srcml.set_source_file(filename)
-    if srcml.set_log_loc(74):
+    srcml.set_function_file(filename)
+    if srcml.set_log_loc(27):
         print srcml.get_log_info()
-        srcml.set_control_dependence()
-        print srcml.get_control_info()
