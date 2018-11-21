@@ -162,6 +162,7 @@ class SrcmlApi:
         """
         if self.log_node is None:
             return False
+
         # iterator parent to find if/switch
         self.control_node = []
         skip_next = False
@@ -179,6 +180,9 @@ class SrcmlApi:
                     skip_next = False
                     continue
                 # filter by if/switch --confition
+                # do not deal with debug level
+                if self._get_text_for_nested_name(parent[0]).find('debug_level') != -1:
+                    continue
                 self.control_node.append(parent[0])
                 # print self.get_text(parent[0])
                 # add case for switch
@@ -200,6 +204,7 @@ class SrcmlApi:
                     self.control += control_info
                     self.control_depenedence_loc += control_loc
                 return True
+    
             # filter by tag catch
             if tag == 'catch':
                 self.control = []
@@ -699,6 +704,17 @@ class SrcmlApi:
 
         return content
 
+    def _is_preprocessor_command(self, node):
+        """
+        @ param node(not none)\n
+        @ return true is processor command\n
+        @ involve check whether is preprocessor command\n
+        """
+        # if prefix is None:
+        #     prefix = 'default'
+        # return node.tag.replace(self.namespace_map[prefix], '')
+        return node.tag.find(self.namespace_map['cpp']) != -1
+
     def _remove_prefix(self, node):
         """
         @ param node(not none)\n
@@ -729,6 +745,8 @@ class SrcmlApi:
         """
         # contain operator ?
         operator_nodes = node.iterdescendants()
+        call_semantics = ''
+        function_name_node = None
         for operator_node in operator_nodes:
             if self._remove_prefix(operator_node).find("oper") != -1 and \
                 (self._remove_blank(operator_node) == '.' or self._remove_blank(operator_node) == '->'):
@@ -741,12 +759,15 @@ class SrcmlApi:
                     call_times = 0 # initialize
 
                 caller, temp_loc = self._get_info_for_name_node(operator_node.getprevious(), call_times)
-                function_name = self._get_info_for_call_node(operator_node.getnext())
-
-                return str(caller) + '.' + function_name
-
-        # no operator
-        return self._get_text_for_nested_name(node)
+                call_semantics += str(caller) + '.'
+                function_name_node = operator_node.getnext()
+           
+        if call_semantics != '':
+            function_name = self._get_text_for_nested_name(function_name_node)
+            return str(call_semantics) + function_name
+        else:
+            # no operator
+            return self._get_text_for_nested_name(node)
 
     def _get_text_for_nested_name(self, node):
         """
@@ -756,18 +777,17 @@ class SrcmlApi:
         """
         if node.text is not None:
             text = self._remove_blank(node)
-            return text
         # traverse children of name without text
         else:
             text = ''
-            name_nodes = node.iterdescendants()
-            for name_node in name_nodes:
-                # add current name node text
-                if name_node.text is not None:
-                    text = text + self._remove_blank(name_node)
-                else:
-                    text = text + self._get_text_for_nested_name(name_node)
-            return text
+        name_nodes = node.iterdescendants()
+        for name_node in name_nodes:
+            # add current name node text
+            if name_node.text is not None:
+                text = text + self._remove_blank(name_node)
+            else:
+                text = text + self._get_text_for_nested_name(name_node)
+        return text
 
     def _get_location_for_nested_node(self, node):
         """
@@ -811,16 +831,21 @@ class SrcmlApi:
 
         variable_nodes += self._get_variable_nodes_for_one_statement(operator_node)
         
-        # following statement cout << a << b; cout << c << d;
+        # following statement cout << a << b; cout << c << d; or << a << b;
         next_stmt_node = stmt_node.getnext()
         is_continue = True
-        while next_stmt_node != None and self._remove_prefix(next_stmt_node) == "expr_stmt" and is_continue:
+        while next_stmt_node != None and is_continue:
+            if self._is_preprocessor_command(next_stmt_node):
+                next_stmt_node = next_stmt_node.getnext()
+                continue
+            if self._remove_prefix(next_stmt_node) != "expr_stmt":
+                break
             is_continue = False
             # first operator node that is <<
             sub_operator_nodes = next_stmt_node.iterdescendants(self.operator_tag)
             for sub_operator_node in sub_operator_nodes:
-                if self._remove_blank(sub_operator_node) == "<<" and \
-                    self._get_text_for_nested_name(sub_operator_node.getprevious()) == variable_name:
+                if self._remove_blank(sub_operator_node) == "<<" and (sub_operator_node.getprevious() is None or\
+                    self._get_text_for_nested_name(sub_operator_node.getprevious()) == variable_name):
 
                     variable_nodes += self._get_variable_nodes_for_one_statement(sub_operator_node)
                     stmt_nodes.append(next_stmt_node)
@@ -841,8 +866,8 @@ class SrcmlApi:
         # same statement << a << b
         sibling_nodes = operator_node.itersiblings()
         for sibling_node in sibling_nodes:
-            if self._remove_prefix(sibling_node) == "operator" and self._remove_blank(sibling_node) == "<<":
-                continue # skip <<
+            if self._is_preprocessor_command(sibling_node) or (self._remove_prefix(sibling_node) == "operator" and self._remove_blank(sibling_node) == "<<"):
+                continue # skip << and cpp:command
             else:
                 variable_nodes.append(sibling_node)
                 
@@ -918,12 +943,15 @@ if __name__ == "__main__":
     #     print srcml_api.get_semantics_for_variable("literal: 60")
 
     srcml = SrcmlApi()
-    filename = "second/sample/ice/generate/gumtree/ice_old_function_2747.cpp"
+    filename = 'test/output.cpp'
     # commands.getoutput("srcml " + filename + " -o test/temp_input.xml")
     # srcml.parse_xml("test/temp_input.xml")
     # srcml.transform_operator()
     # # transform source code from temp output file
     # commands.getoutput("srcml " + "test/temp_output.xml -S > test/output.cpp")
+
     srcml.set_function_file(filename)
-    if srcml.set_log_loc(27):
+    if srcml.set_log_loc(7):
         print srcml.get_log_info()
+        srcml.set_control_dependence()
+        print srcml.get_control_info()
