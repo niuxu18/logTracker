@@ -71,10 +71,10 @@ def check_given_log_in_function(function_name, check, variable, postfix=''):
         # records store by function name, so quit if meet new function name
         elif flag_meet_function:
             log_file.close()
-            return "accpept-true"
+            return "accept-true"
 
     log_file.close()
-    return "accpept-true"
+    return "accept-true"
 
 def check_for_insert_rule(rule_feature, function, postfix=''):
     """
@@ -572,7 +572,6 @@ def generate_xlsx_from_clone():
         # only save positive rules
         if record[-1] != 'accept-true':
             continue
-
         class_index = record[0]
         # print 'now save class_index %s' %(class_index)
         # find historical revisions
@@ -606,6 +605,8 @@ def generate_xlsx_from_clone():
     r = 1
     for record in islice(records, 1, None):
         # print 'now save class_index %s' %(class_index)
+        if record[-1] != 'accept-true':
+            continue
         class_index = record[0]
         # find historical revisions
         revisions = cluster_api.generate_records_for_class(my_constant.CLUSTER_EDITION_AND_FEATURE_OLD_NEW_FILE_NAME, class_index)
