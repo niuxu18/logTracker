@@ -565,6 +565,7 @@ def generate_xlsx_from_clone():
     c = 0
     for value in my_constant.CLONE_LOG_TITLE:
         sheet.write(0, c, value)
+        sheet.col(c).width = 256*4
         c += 1
     # sheet content
     r = 1
@@ -600,6 +601,7 @@ def generate_xlsx_from_clone():
     c = 0
     for value in my_constant.CLONE_FUNCTION_TITLE:
         sheet.write(0, c, value)
+        sheet.col(c).width = 256*4
         c += 1
     # sheet content
     r = 1

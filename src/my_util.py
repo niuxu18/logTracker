@@ -336,6 +336,8 @@ def csv_to_xlsx(file_name, sheet):
             c += 1
         r += 1
     
+    for i in range(c):
+        sheet.col(i).width = 256*4
     csv_file.close()
 
 def get_deckard_dict():

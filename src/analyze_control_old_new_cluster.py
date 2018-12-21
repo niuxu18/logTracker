@@ -205,7 +205,6 @@ def generate_xlsx_from_csv_cluster():
     sheet = workbook.add_sheet('edition_and_feature_cluster')
 
     my_util.csv_to_xlsx(my_constant.CLUSTER_EDITION_AND_FEATURE_OLD_NEW_FILE_NAME, sheet)
-
     workbook.save(my_constant.CLUSTER_FILE_NAME)
 
 def generate_xlsx_from_csv_class(sheet):
