@@ -28,11 +28,11 @@ def transform_operator(input_dir):
     for filename in filenames:
         index += 1
         print "now processing %d / %d, file: %s" %(index, total_counts, filename)
-        commands.getoutput("srcml " + filename + " -o test/temp_input.xml")
+        commands.getoutput("srcml " + filename + " -o test/temp_input.xml" + " > null")
         srcml.parse_xml("test/temp_input.xml")
         srcml.transform_operator()
         # transform source code from temp output file
-        commands.getoutput("srcml " + "test/temp_output.xml -S > " + filename)
+        commands.getoutput("srcml " + "test/temp_output.xml -S > " + filename + " > null")
 
 
 def deal_versions(input_dir):

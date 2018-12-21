@@ -42,21 +42,25 @@ def generate_rules(parent_dir):
     my_util.create_dir_if_no(my_constant.PATCH_DIR)
     my_util.create_dir_if_no(my_constant.GUMTREE_DIR)
 
-    print '\n****************now generating rules for repos %s***************' %(my_constant.REPOS)
+    print '\n****************now generating patch for repos %s***************' %(my_constant.REPOS)
     # analyze hunk
     fetch_hunk.fetch_version_diff(True)
+    print '\n****************now dealing hunk for repos %s***************' %(my_constant.REPOS)
     analyze_hunk.fetch_hunk()
 
     # analyze gumtree and srcml
+    print '\n****************now analyzing log for repos %s***************' %(my_constant.REPOS)
     analyze_control_old_new.analyze_old_new(True)
     
     # generate rule
+    print '\n****************now generating rules for repos %s***************' %(my_constant.REPOS)
     analyze_control_old_new_cluster.cluster()
-    print 'now generate class'
+    print 'store %s success' %my_constant.CLUSTER_EDITION_AND_FEATURE_OLD_NEW_FILE_NAME
     analyze_control_old_new_cluster.generate_class()
-    print 'now generate xlsx'
+    print 'store %s success' %my_constant.CLASS_EDITION_AND_FEATURE_OLD_NEW_FILE_NAME
     analyze_control_old_new_cluster.generate_xlsx_from_csv_cluster()
-    print 'exit'
+    print 'store %s success' %my_constant.CLUSTER_FILE_NAME
+    print '\n****************generating rule success for repos %s***************' %(my_constant.REPOS)
 
 def apply_rules(parent_dir, apply_version):
     """
@@ -78,10 +82,12 @@ def apply_rules(parent_dir, apply_version):
     print '\n****************now applying rules for repos %s***************' %(my_constant.REPOS)
     # apply rule
     analyze_control_clone.seek_clone(my_constant.REPOS_NAME, True)
-    print 'now generate xlsx'
+    print 'store %s success' %my_constant.ANALYZE_CLONE_LOG_FILE_NAME
+    print 'store %s success' %my_constant.ANALYZE_CLONE_FUNCTION_FILE_NAME
     analyze_control_clone.generate_xlsx_from_clone()
-    print 'now calculate call times'
-    statistics.statistical_repos_call_log_times('')
+    print 'store %s success' %my_constant.CLONE_FILE_NAME
+    # statistics.statistical_repos_call_log_times('')  # do not use this when display
+    print '\n****************applying rule success for repos %s***************' %(my_constant.REPOS)
 
 
 def command():

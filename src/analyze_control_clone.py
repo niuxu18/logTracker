@@ -569,6 +569,10 @@ def generate_xlsx_from_clone():
     # sheet content
     r = 1
     for record in islice(records, 1, None):
+        # only save positive rules
+        if record[-1] != 'accept-true':
+            continue
+
         class_index = record[0]
         # print 'now save class_index %s' %(class_index)
         # find historical revisions

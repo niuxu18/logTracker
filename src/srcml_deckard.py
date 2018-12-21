@@ -30,7 +30,7 @@ class SrcmlApi:
         # intiate xml info
         xml_file = 'test/temp.xml'
         # print '%s begin' %source_file
-        commands.getoutput('srcml --position ' + source_file + ' -o ' + xml_file)
+        commands.getoutput('srcml --position ' + source_file + ' -o ' + xml_file + ' > null')
         # print '%s end' %source_file
         self.parse_xml(xml_file)
         # initiate functions
@@ -57,7 +57,7 @@ class SrcmlApi:
                 output = 'initialize'
                 while output != '':
                     # print '%s begin' %function_xml_name
-                    output = commands.getoutput('srcml -S ' + function_xml_name + ' -o ' + function_file_name)
+                    output = commands.getoutput('srcml -S ' + function_xml_name + ' -o ' + function_file_name + ' > null')
                     # print '%s end' %function_xml_name
                 # read_file = open(function_file_name, 'rb')
                 # read_content_after = read_file.read()
@@ -77,7 +77,7 @@ class SrcmlApi:
         # intiate xml info
         xml_file = function_file + '.xml'
         # print '%s begin' %function_file
-        commands.getoutput('srcml --position ' + function_file + ' -o ' + xml_file)
+        commands.getoutput('srcml --position ' + function_file + ' -o ' + xml_file + ' > null')
         # print '%s end' %function_file
         self.parse_xml(xml_file)
         # initiate log and control info
