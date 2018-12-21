@@ -95,6 +95,7 @@ def check_for_modify_rule(edit_words, curr_log):
     """
     old_edits = edit_words[0]
     new_edits = edit_words[1]
+
     # log to word list
     curr_log = my_util.remove_given_element('',\
              re.split(my_constant.SPLIT_LOG, curr_log))
@@ -634,8 +635,9 @@ if __name__ == "__main__":
     # list_b = [[["!", "struct user *"]], [["strstr", "char *", "\"user \"", "char *", "=="]]]
     # print compute_context_similarity(list_a, list_b, {})
 
-    old_file = 'second/sample/make/generate/gumtree/make_old_log_630.cpp'
-    new_file = 'second/sample/make/generate/gumtree/make_new_log_630.cpp'
-    candidate_file = 'second/gumtree/c/candidate.cpp'
-    gumtree = Gumtree()
-    print get_recommended_log_edits(gumtree, None, old_file, new_file, 'fatal (NILF, _("create_child_process: DuplicateHandle(In) failed (e=%d)\n"),GetLastError())')
+#    old_file = 'second/sample/make/generate/gumtree/make_old_log_630.cpp'
+#     new_file = 'second/sample/make/generate/gumtree/make_new_log_630.cpp'
+#     candidate_file = 'second/gumtree/c/candidate.cpp'
+#     gumtree = Gumtree()
+#     print get_recommended_log_edits(gumtree, None, old_file, new_file, 'fatal (NILF, _("create_child_process: DuplicateHandle(In) failed (e=%d)\n"),GetLastError())') 
+    print check_for_modify_rule([["cout"], ["cerr"]], 'consoleOut(ICE_STRING_VERSION ,endl)')

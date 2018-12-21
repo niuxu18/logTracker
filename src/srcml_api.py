@@ -180,9 +180,12 @@ class SrcmlApi:
                     skip_next = False
                     continue
                 # filter by if/switch --confition
-                # do not deal with debug level
-                if self._get_text_for_nested_name(parent[0]).find('debug_level') != -1:
-                    continue
+
+
+                # # do not deal with debug level
+                # if self._get_text_for_nested_name(parent[0]).find('debug_level') != -1:
+                #     continue
+
                 self.control_node.append(parent[0])
                 # print self.get_text(parent[0])
                 # add case for switch
