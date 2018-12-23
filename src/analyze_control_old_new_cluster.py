@@ -7,7 +7,6 @@ import commands
 import json
 from itertools import islice
 from gumtree_api import Gumtree
-from z3_api import Z3_api
 import cluster_api
 import my_util
 import my_constant
@@ -16,7 +15,7 @@ import gumtree_api
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-def cluster_feature(z3_api):
+def cluster_feature():
     """
     @ param nothing\n
     @ return nothing\n
@@ -34,11 +33,7 @@ def cluster_feature(z3_api):
             continue
         check_feature = json.loads(record[my_constant.ANALYZE_CHECK]) 
         variable_feature = json.loads(record[my_constant.ANALYZE_VARIABLE])
-        # z3 feature
-        if z3_api is not None:
-            check_feature = z3_api.get_infix_for_postfix(check_feature)
-            print 'now processing %d file' %(index)
-            index += 1
+        
         feature_lists.append([check_feature, variable_feature])
     read_file.close()
 
@@ -80,7 +75,7 @@ def cluster_edition():
     
     write_file.close()
 
-def cluster_edition_and_feature_without_coontent(z3_api=None):
+def cluster_edition_and_feature_without_coontent():
     """
     @ param z3 api\n
     @ return nothing\n
@@ -99,11 +94,7 @@ def cluster_edition_and_feature_without_coontent(z3_api=None):
         # context feature
         check_feature = json.loads(record[my_constant.ANALYZE_CHECK])
         variable_feature = json.loads(record[my_constant.ANALYZE_VARIABLE])
-        # z3 feature
-        if z3_api is not None:
-            check_feature = z3_api.get_infix_for_postfix(check_feature)
-            print 'now processing %d file' %(index)
-            index += 1
+       
         # edit feature
         edit_types = json.loads(record[my_constant.ANALYZE_EDIT_TYPE])
         edit_feature = gumtree_api.get_edit_feature_from_edit_types(edit_types)
@@ -119,7 +110,7 @@ def cluster_edition_and_feature_without_coontent(z3_api=None):
     
     write_file.close()
 
-def cluster_edition_and_feature(z3_api=None):
+def cluster_edition_and_feature():
     """
     @ param z3 api\n
     @ return nothing\n
@@ -138,11 +129,7 @@ def cluster_edition_and_feature(z3_api=None):
         # context feature
         check_feature = json.loads(record[my_constant.ANALYZE_CHECK])
         variable_feature = json.loads(record[my_constant.ANALYZE_VARIABLE])
-        # z3 feature
-        if z3_api is not None:
-            check_feature = z3_api.get_infix_for_postfix(check_feature)
-            print 'now processing %d file' %(index)
-            index += 1
+        
         # edit feature
         edit_feature = json.loads(record[my_constant.ANALYZE_EDIT_FEATURE])
         feature_lists.append([check_feature, variable_feature, edit_feature])
@@ -184,16 +171,16 @@ def _cluster_with_feature_list(feature_list, file_writer):
     for record in sort_records:
         file_writer.writerow(record)
 
-def cluster(z3_api=None):
+def cluster():
     """
     @ param z3 api\n
     @ return nothing\n
     @ involve cluster by feature and edition/ edition/ feature\n
     """
-    cluster_edition_and_feature(z3_api)
-    # cluster_edition_and_feature_without_coontent(z3_api)
+    cluster_edition_and_feature()
+    # cluster_edition_and_feature_without_coontent()
     cluster_edition()
-    cluster_feature(z3_api)
+    cluster_feature()
 
 def generate_xlsx_from_csv_cluster():
     """

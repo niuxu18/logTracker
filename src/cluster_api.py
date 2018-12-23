@@ -5,7 +5,6 @@ import re
 import commands
 import json
 from itertools import islice
-from z3_api import Z3_api
 import analyze_control_clone
 import my_util
 import my_constant
@@ -26,23 +25,13 @@ class mycluster:
         self.id = id
         self.similarity = similarity
 
-def compute_equality(vec_a, vec_b, z3_api):
+def compute_equality(vec_a, vec_b):
     """
     @ param vector a and b for comparing, z3 api\n
     @ return true if equal\n
     @ involve compute equality between vectors, use z3 or just ==\n
     """
-    if z3_api:
-        check_a = vec_a[0]
-        var_a = vec_a[1]
-        check_b = vec_b[0]
-        var_b = vec_b[1]
-        var_a.sort()
-        var_b.sort()
-        return z3_api.judge_equality_for_statments(check_a, check_b) \
-                    and var_a == var_b
-    else:
-        return vec_a == vec_b
+    return vec_a == vec_b
 
 def compute_similarity_for_cluster(cluster_a, cluster_b, similarity_dic, similarity=1):
     """
@@ -147,9 +136,9 @@ def cluster_record_with_similarity(feature_lists, cluster_similarity=0.95):
         index += 1
     return cluster_lists
 
-def compute_equality_for_cluster(cluster_a, cluster_b, similarity_dic, z3_api):
+def compute_equality_for_cluster(cluster_a, cluster_b, similarity_dic):
     """
-    @ param cluster a and b for comparing, similarity_dic, z3 api\n
+    @ param cluster a and b for comparing, similarity_dic\n
     @ return true if equal\n
     @ involve compute equality between clusters (equality of any sub entity)\n
     """
@@ -159,20 +148,20 @@ def compute_equality_for_cluster(cluster_a, cluster_b, similarity_dic, z3_api):
 
     # compare cdg_list of entity
     if cluster_a.id >= 0 and cluster_b.id >= 0:
-        return compute_equality(cluster_a.vec, cluster_b.vec, z3_api)
+        return compute_equality(cluster_a.vec, cluster_b.vec)
 
 
     # first cluster (children)
     if cluster_a.id < 0:
         # first child
-        return compute_equality_for_cluster(cluster_a.children[0], cluster_b, similarity_dic, z3_api)
+        return compute_equality_for_cluster(cluster_a.children[0], cluster_b, similarity_dic)
 
     # second cluster (children)
     if cluster_b.id < 0:
         # first child
-        return compute_equality_for_cluster(cluster_a, cluster_b.children[0], similarity_dic, z3_api)
+        return compute_equality_for_cluster(cluster_a, cluster_b.children[0], similarity_dic)
 
-def cluster_record_with_equality(feature_lists, z3_api=None):
+def cluster_record_with_equality(feature_lists):
     """
     @param: feature lists\n
     @return cluster index for each entity\n
@@ -197,7 +186,7 @@ def cluster_record_with_equality(feature_lists, z3_api=None):
 
                     # compute similaritys by calling computeSim on (vector a, vector b)
                     similarity_dic[(myclusters[i].id, myclusters[j].id)] =\
-                        compute_equality_for_cluster(myclusters[i], myclusters[j], similarity_dic, z3_api)
+                        compute_equality_for_cluster(myclusters[i], myclusters[j], similarity_dic)
                     # record symmetrical record
                     similarity_dic[(myclusters[j].id, myclusters[i].id)] =\
                                 similarity_dic[(myclusters[i].id, myclusters[j].id)]
