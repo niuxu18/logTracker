@@ -29,8 +29,8 @@ def get_recommended_log_edits(gumtree, srcml, old_log_file, new_log_file, candid
     recommended_log_edits = ""
     edits = syntactical_edit_scripts.split('\n')
     for edit in edits:
-        # retrieve codes in new file $$***$$
-        content = re.search(r'\$\$(.*)\$\$', edit)
+        # retrieve codes in new file %%***%%
+        content = re.search(my_constant.EDIT_NEW_MARK + r'(.*)' + my_constant.EDIT_NEW_MARK, edit)
         if content:
             content = content.group(1)
             is_literal = re.search(r'(literal: )*"(.*)"', content)
@@ -39,7 +39,7 @@ def get_recommended_log_edits(gumtree, srcml, old_log_file, new_log_file, candid
             if not is_literal and srcml is not None:
                 semantics = srcml.get_semantics_for_variable(content)
                 # semantics = "srcml_output"
-                edit = edit.replace('$$'+content+'$$', '$$'+semantics+'$$')
+                edit = edit.replace(my_constant.EDIT_NEW_MARK + content + my_constant.EDIT_NEW_MARK, my_constant.EDIT_NEW_MARK + semantics + my_constant.EDIT_NEW_MARK)
         recommended_log_edits += edit
         recommended_log_edits += '\n'
     

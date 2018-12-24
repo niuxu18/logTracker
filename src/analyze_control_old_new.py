@@ -32,8 +32,8 @@ def _get_semantics_for_new_log(syntactical_edit, srcml):
     semantical_edit = ""
     edits = syntactical_edit.split('\n')
     for edit in edits:
-        # retrieve codes in new file $$***$$
-        content = re.search(r'\$\$(.*)\$\$', edit)
+        # retrieve codes in new file my_constant.EDIT_NEW_MARK***my_constant.EDIT_NEW_MARK
+        content = re.search(my_constant.EDIT_NEW_MARK+r'(.*)'+my_constant.EDIT_NEW_MARK, edit)
         if content:
             content = content.group(1)
             is_literal = re.search(r'literal: (.*)', content) # do not modify literal
@@ -47,7 +47,8 @@ def _get_semantics_for_new_log(syntactical_edit, srcml):
                 # remove detail info
                 if semantics.find(':') != -1:
                     semantics = semantics[:semantics.find(':')]
-                edit = edit.replace('$$'+content+'$$', '$$'+semantics+'$$')
+                edit = edit.replace(my_constant.EDIT_NEW_MARK+content+my_constant.EDIT_NEW_MARK, \
+                                        my_constant.EDIT_NEW_MARK+semantics+my_constant.EDIT_NEW_MARK)
         semantical_edit += edit
         semantical_edit += '\n'
 
@@ -65,7 +66,7 @@ def _get_semantics_for_old_log(syntactical_edit, srcml):
     for edit in edits:
         # retrieve codes in new file @@***@@
         # deal multiple @@
-        old_pattern = r'@@([^@]*)@@'
+        old_pattern = my_constant.EDIT_OLD_MARK + r'([^@]*)' + my_constant.EDIT_OLD_MARK
         temp_edit = edit
         content = re.search(old_pattern, temp_edit)
         while content:
@@ -81,10 +82,10 @@ def _get_semantics_for_old_log(syntactical_edit, srcml):
                 # remove detail info
                 if semantics.find(':') != -1:
                     semantics = semantics[:semantics.find(':')]
-                edit = edit.replace('@@'+content+'@@', '@@'+semantics+'@@')
+                edit = edit.replace(my_constant.EDIT_OLD_MARK +content+my_constant.EDIT_OLD_MARK, my_constant.EDIT_OLD_MARK+semantics+my_constant.EDIT_OLD_MARK)
 
             # find next content
-            temp_edit = temp_edit.replace('@@'+content+'@@', '')
+            temp_edit = temp_edit.replace(my_constant.EDIT_OLD_MARK+content+my_constant.EDIT_OLD_MARK, '')
             content = re.search(old_pattern, temp_edit)
 
         semantical_edit += edit
@@ -102,7 +103,8 @@ def _get_hash_for_semantics(semantical_edit):
     hash_number = 0
     for edit in edits:
         # find update literal to literal
-        update_literal = re.search(r'update\t@@literal: "(.*)"@@\tto\t\$\$literal: "(.*)"\$\$literal:.*\$\$', edit)
+        update_literal = re.search(r'update\t' + my_constant.EDIT_OLD_MARK + r'literal: "(.*)"' + my_constant.EDIT_OLD_MARK \
+          +r'\tto\t' + my_constant.EDIT_NEW_MARK + r'literal: "(.*)"' +  my_constant.EDIT_NEW_MARK+ r'literal:.*' +  my_constant.EDIT_NEW_MARK, edit)
         if update_literal:
             hash_diff = 0
             old_literals = my_util.remove_given_element('', \

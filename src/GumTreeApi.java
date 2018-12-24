@@ -50,6 +50,8 @@ public class GumTreeApi {
 //	final String COMMENT_TYPE = "comment";
 //	final String BLOCK_TYPE = "block";
 	final String IF_TYPE = "if";
+	final String NEW_MARK = "%%";
+	final String OLD_MARK = "@@";
 	// application specific info for " analyze file "
 	private int loc;
 	private int functionLoc;
@@ -59,6 +61,7 @@ public class GumTreeApi {
 	private String filename;
 	// application specific info for " match old and repos according to old and new"
 	private List<ITree> editedNodes;
+	
 
 	public void setOldAndNewFile(String oldFile, String newFile) {
 		Run.initGenerators();
@@ -740,10 +743,10 @@ public class GumTreeApi {
 			{
 			case "INS":
 				Insert insertAction = (Insert)currAction;
-				output += "add\t$$";
+				output += "add\t" + NEW_MARK;
 //				new node
 				output += this.getPrettyString(insertAction.getNode(), historyTreeContext, newLogFile);
-				output += "$$\tin\t";
+				output += NEW_MARK + "\tin\t";
 //				old node
 				ITree parentNode = insertAction.getParent();
 				ITree oldNode = historyMap.getSrc(parentNode);
@@ -770,12 +773,13 @@ public class GumTreeApi {
 				boolean a = this.mappings.hasSrc(updateAction.getNode());
 				output += this.getPrettyString(this.mappings.getDst(updateAction.getNode()), this.newTreeContext, this.newFile);
 				// new value
-				output += "\tto\t$$";
+				output += "\tto\t" + NEW_MARK;
 				output += this.getType(updateAction.getNode(), this.oldTreeContext);
 				output += ": ";
-				output += updateAction.getValue().replace("\n", "") + "$$";
+				output += updateAction.getValue().replace("\n", "") + NEW_MARK;
 				break;
-			case "MOV":
+			case "MO3156"
+					+ "V":
 				output += "move\t";
 				Move moveAction = (Move)currAction;
 				// old node
@@ -823,10 +827,10 @@ public class GumTreeApi {
 			{
 			case "INS":
 				Insert insertAction = (Insert)currAction;
-				output += "add\t$$";
+				output += "add\t" + NEW_MARK;
 //					new node
 				output += this.getPrettyString(insertAction.getNode(), this.newTreeContext, this.newFile);
-				output += "$$\tin\t@@";
+				output += NEW_MARK + "\tin\t" + OLD_MARK;
 //					old node
 				ITree parentNode = insertAction.getParent();
 				ITree oldNode = this.mappings.getSrc(parentNode);
@@ -835,36 +839,36 @@ public class GumTreeApi {
 					parentNode = parentNode.getParent();
 					oldNode = historyMap.getSrc(parentNode);
 				}
-				output += this.getPrettyString(oldNode, this.oldTreeContext, this.oldFile) + "@@";
+				output += this.getPrettyString(oldNode, this.oldTreeContext, this.oldFile) + OLD_MARK;
 				break;
 			case "DEL":
-				output += "remove\t@@";
+				output += "remove\t" + OLD_MARK;
 				Delete deleteAction = (Delete)currAction;
 				// old node
 				output += this.getPrettyString(deleteAction.getNode(), this.oldTreeContext, this.oldFile);
-				output += "@@\tfrom\t@@";
+				output += OLD_MARK + "\tfrom\t" + OLD_MARK;
 				// parent
-				output += this.getPrettyString(deleteAction.getNode().getParent(), this.oldTreeContext, this.oldFile) + "@@";
+				output += this.getPrettyString(deleteAction.getNode().getParent(), this.oldTreeContext, this.oldFile) + OLD_MARK;
 				break;
 			case "UPD":
-				output += "update\t@@";
+				output += "update\t" + OLD_MARK;
 				Update updateAction = (Update)currAction;
 				// old node
 				output += this.getPrettyString(updateAction.getNode(), this.oldTreeContext, this.oldFile);
 				// new value
-				output += "@@\tto\t$$";
+				output += OLD_MARK + "\tto\t" + NEW_MARK;
 				output += this.getType(updateAction.getNode(), this.oldTreeContext);
 				output += ": ";
-				output += updateAction.getValue().replace("\n", "") + "$$";
+				output += updateAction.getValue().replace("\n", "") + NEW_MARK;
 				break;
 			case "MOV":
-				output += "move\t@@";
+				output += "move\t" + OLD_MARK;
 				Move moveAction = (Move)currAction;
 				// old node
 				output += this.getPrettyString(moveAction.getNode(), this.oldTreeContext, this.oldFile);
 				// old parent
-				output += "@@\tfrom\t@@";
-				output += this.getPrettyString(moveAction.getParent(), this.oldTreeContext, this.oldFile) + "@@";
+				output += OLD_MARK + "\tfrom\t" + OLD_MARK;
+				output += this.getPrettyString(moveAction.getParent(), this.oldTreeContext, this.oldFile) + OLD_MARK;
 //					System.out.printf("WARN: DO NOT DEAL WITH MOVE in %s: %d\n", this.oldFile, this.oldLoc);
 				break;
 			}

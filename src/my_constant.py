@@ -212,6 +212,8 @@ LOG_EDIT_TYPES = ["addLog", "removeLog", "moveLog", "updateLog", "addVariable", 
 ast node type for deckard(8)
 """
 DECKARD_AST_NODE_TYPES = ["call", "argument", "literal", "name", "decl", "operator", "modifier", "specifier"]
+EDIT_NEW_MARK = '%%'
+EDIT_OLD_MARK = '@@'
 
 """
 data dependence type
