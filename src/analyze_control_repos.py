@@ -19,7 +19,7 @@ import gumtree_api
 import my_constant
 import my_util
 
-reload(sys);
+reload(sys)
 sys.setdefaultencoding('utf8')
 
 def analyze_file(file_name, function_cnt, postfix, srcml):

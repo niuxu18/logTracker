@@ -33,3 +33,15 @@ languagepacks.json
 *.log
 *.sock
 null
+
+
+## test source codes
+locate_related_logs_1.py
+locate_related_logs.py
+analyze_test.py
+database_api.py
+demo.py
+fetch_version_archieve_from_github.py
+plot.pyc
+statistics.py
+test.py
