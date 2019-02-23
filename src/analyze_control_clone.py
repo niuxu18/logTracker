@@ -487,7 +487,7 @@ def seek_clone_for_train_rule(repos_name, repos_log_clone_writer,repos_function_
         if old_loc == '-1':
             # filter insert rule by info
             if not filter_insert_rule(rule_feature):
-                    continue
+                continue
             for repos_function_record in islice(repos_function_records, 1, None):
                 calls = json.loads(repos_function_record[my_constant.ANALYZE_REPOS_FUNCTION_CALLS])
                 types = json.loads(repos_function_record[my_constant.ANALYZE_REPOS_FUNCTION_TYPES])

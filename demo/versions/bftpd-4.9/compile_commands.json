@@ -1,0 +1,62 @@
+[
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o bftpdutmp.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/bftpdutmp.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/bftpdutmp.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o commands.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/commands.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/commands.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o commands_admin.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/commands_admin.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/commands_admin.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o cwd.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/cwd.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/cwd.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o dirlist.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/dirlist.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/dirlist.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o list.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/list.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/list.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o login.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/login.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/login.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o logging.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/logging.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/logging.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o main.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/main.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/main.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o mystring.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/mystring.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/mystring.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o options.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/options.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/options.c"
+    },
+    {
+        "command": "cc -c -g -O2 -DHAVE_CONFIG_H -Wall -I/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9 -DVERSION=\\\"4.9\\\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\\\"/usr\\\" -o md5.o /usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/md5.c",
+        "directory": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9",
+        "file": "/usr/info/code/cpp/LogMonitor/LogMonitor/second/sample/bftpd/versions/bftpd-4.9/md5.c"
+    }
+]
